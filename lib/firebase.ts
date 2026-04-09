@@ -1,4 +1,3 @@
-// lib/firebase.ts
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
@@ -13,11 +12,8 @@ const firebaseConfig = {
   measurementId: "G-4906LN4V1Z"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-// Services
-const db = getFirestore(app);        // Firestore Database
-const storage = getStorage(app);     // Storage (PDF files ke liye)
-
-export { db, storage, app };
+export { db, storage };
