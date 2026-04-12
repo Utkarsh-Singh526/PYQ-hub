@@ -31,8 +31,8 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold text-white mb-4">Developed By</h4>
             <p className="text-gray-400 text-sm mb-4">
-              Utkarsh Singh<br />
-              Kanpur, Uttar Pradesh<br />
+              Utkarsh Singh 526 <br />
+              {/* Prayagraj, Uttar Pradesh<br /> */}
               Computer Science Student
             </p>
 

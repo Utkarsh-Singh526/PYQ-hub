@@ -1,19 +1,22 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+// import { initializeApp } from 'firebase/app';
+// import { getFirestore } from 'firebase/firestore';
+// import { getStorage } from 'firebase/storage';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDIbDMRkAIzUGrUTVzoj67MY8N1d4dyRd8",
-  authDomain: "college-pyq-hub-8f723.firebaseapp.com",
-  projectId: "college-pyq-hub-8f723",
-  storageBucket: "college-pyq-hub-8f723.firebasestorage.app",
-  messagingSenderId: "928761975266",
-  appId: "1:928761975266:web:6db7623f8c5cc1d344a9bb",
-  measurementId: "G-4906LN4V1Z"
-};
+// const firebaseConfig = {
+//   apiKey: "AIzaSyC1zlsJqz-ZqEYZSD23NSiqmP239-VuE7I",
+//   authDomain: "pyq-hub-526.firebaseapp.com",
+//   projectId: "pyq-hub-526",
+//   storageBucket: "pyq-hub-526.firebasestorage.app",
+//   messagingSenderId: "393075719091",
+//   appId: "1:393075719091:web:5a5ae43882f787076729c6",
+//   measurementId: "G-SLWLCZ7LLS"
+// };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+// // Initialize Firebase
+// const app = initializeApp(firebaseConfig);
 
-export { db, storage };
+// // Services
+// const db = getFirestore(app);
+// const storage = getStorage(app);
+
+// export { db, storage, app };

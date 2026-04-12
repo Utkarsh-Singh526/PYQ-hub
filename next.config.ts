@@ -2,13 +2,9 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   typescript: {
-    ignoreBuildErrors: true,     // TypeScript errors ignore karo
+    ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,    // ESLint errors ignore karo
-  },
-  // Extra performance settings for Vercel
-  swcMinify: true,
+  // Removed invalid keys (eslint and swcMinify)
 };
 
 export default nextConfig;

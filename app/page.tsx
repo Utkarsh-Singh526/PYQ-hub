@@ -11,7 +11,7 @@ export default function Home() {
           College PYQ Hub
         </h1>
         <p className="text-2xl text-gray-300 mb-10 max-w-3xl mx-auto">
-          Previous Year Questions, Important Questions aur Syllabus ek jagah
+          AKTU Previous Year Questions, Important Questions aur Syllabus ek jagah
         </p>
         <Link href="/pyq">
           <Button size="lg" className="text-lg px-12 py-7 bg-blue-600 hover:bg-blue-700">
@@ -27,7 +27,7 @@ export default function Home() {
             <Card className="bg-gray-900 border-gray-700 hover:border-blue-600 transition-all h-full">
               <CardContent className="p-10 text-center">
                 <h3 className="text-3xl font-semibold text-white mb-4">PYQ Papers</h3>
-                <p className="text-gray-400 text-lg">Sectional 1, Sectional 2, End Semester</p>
+                <p className="text-gray-400 text-lg">Sessional 1, Sessional 2, End Semester</p>
               </CardContent>
             </Card>
           </Link>
