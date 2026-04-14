@@ -8,40 +8,33 @@ export default function VisitorCounter() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const updateVisitorCount = async () => {
+    const incrementAndGetCount = async () => {
       try {
-        // Increment the count
-        const { error: updateError } = await supabase
+        // Step 1: Increment the count
+        await supabase
           .from('site_stats')
-          .upsert(
-            { name: 'visitors', count: supabase.rpc('increment') },
-            { onConflict: 'name' }
-          );
+          .update({ count: supabase.rpc('increment_count') })  // We'll create this function
+          .eq('name', 'visitors');
 
-        if (updateError) throw updateError;
-
-        // Get the latest count
-        const { data, error: fetchError } = await supabase
+        // Step 2: Get the updated count
+        const { data, error } = await supabase
           .from('site_stats')
           .select('count')
           .eq('name', 'visitors')
           .single();
 
-        if (fetchError) throw fetchError;
+        if (error) throw error;
+        if (data) setCount(data.count);
 
-        if (data) {
-          setCount(data.count);
-        }
       } catch (err) {
         console.error("Visitor counter error:", err);
-        // No fallback number - just keep it as 0 if error
         setCount(0);
       } finally {
         setLoading(false);
       }
     };
 
-    updateVisitorCount();
+    incrementAndGetCount();
   }, []);
 
   return (
