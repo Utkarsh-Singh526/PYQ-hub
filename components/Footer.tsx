@@ -37,6 +37,9 @@ export default function Footer() {
               {/* Prayagraj, Uttar Pradesh<br /> */}
               Computer Science Student
             </p>
+            <div className="text-gray-400 text-sm mb-4"><p className="text-sm text-green-400 mt-4">
+            👥 Total Visitors: <VisitorCounter />
+              </p></div>
 
             <div className="flex flex-wrap gap-x-8 gap-y-2 text-lg">
               <a 
@@ -48,7 +51,7 @@ export default function Footer() {
                 GitHub
               </a>
               <a 
-                href="https://linkedin.com/in/utkarsh-singh526" 
+                href="https://www.linkedin.com/in/utkarsh-singh-79b192243?utm_source=share_via&utm_content=profile&utm_medium=member_android" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition"

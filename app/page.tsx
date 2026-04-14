@@ -27,7 +27,7 @@ export default function Home() {
             <Card className="bg-gray-900 border-gray-700 hover:border-blue-600 transition-all h-full">
               <CardContent className="p-10 text-center">
                 <h3 className="text-3xl font-semibold text-white mb-4">PYQ Papers</h3>
-                <p className="text-gray-400 text-lg">Sessional 1, Sessional 2, End Semester</p>
+                <p className="text-gray-400 text-lg">Access End Semester papers of AKTU along with Sessional 1 and Sessional 2 papers of UCER for effective exam preparation</p>
               </CardContent>
             </Card>
           </Link>
