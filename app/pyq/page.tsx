@@ -22,12 +22,14 @@ export default function PYQPage() {
   const [selectedBranch, setSelectedBranch] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedSem, setSelectedSem] = useState("");
+  const [selectedType, setSelectedType] = useState("");   // ← New
   const [papers, setPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const branches = ["CSE", "ECE", "AIML", "Mechanical", "Civil", "Electrical", "IT"];
-  const years = [2023, 2024, 2025, 2026];
+  const branches = ["CSE", "ECE", "Mechanical", "Civil", "Electrical", "IT"];
+  const years = [2021, 2022, 2023, 2024, 2025, 2026];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
+  const types = ["Sessional 1", "Sessional 2", "End Semester"];
 
   const fetchPapers = async () => {
     if (!selectedBranch || !selectedYear || !selectedSem) {
@@ -37,18 +39,27 @@ export default function PYQPage() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('pyq_papers')
         .select('*')
         .eq('branch', selectedBranch)
         .eq('year', parseInt(selectedYear))
         .eq('semester', parseInt(selectedSem));
 
-      if (error) throw error;
+      if (selectedType) {
+        query = query.eq('type', selectedType);
+      }
 
-      setPapers(data || []);
-    } catch (error) {
-      console.error("Error fetching papers:", error);
+      const { data, error } = await query.order('uploadedAt', { ascending: false });
+
+      if (error) {
+        console.error("Supabase fetch error:", error);
+        setPapers([]);
+      } else {
+        setPapers(data || []);
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
       setPapers([]);
     } finally {
       setLoading(false);
@@ -57,23 +68,20 @@ export default function PYQPage() {
 
   useEffect(() => {
     fetchPapers();
-  }, [selectedBranch, selectedYear, selectedSem]);
-
-  const filteredPapers = useMemo(() => papers, [papers]);
+  }, [selectedBranch, selectedYear, selectedSem, selectedType]);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 bg-gray-950 min-h-screen">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold text-white mb-4">Previous Year Question Papers</h1>
-        <p className="text-xl text-gray-400">Using Supabase</p>
+        <h1 className="text-5xl font-bold text-white mb-4">AKTU Previous Year Question Papers</h1>
       </div>
 
       {/* Filters */}
       <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 mb-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
             <label className="text-sm text-gray-300 block mb-2">Branch</label>
-            <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+            <Select value={selectedBranch} onValueChange={(value) => setSelectedBranch(value || "")}>
               <SelectTrigger className="bg-gray-800 border-gray-600 h-12 text-white">
                 <SelectValue placeholder="Select Branch" />
               </SelectTrigger>
@@ -85,7 +93,7 @@ export default function PYQPage() {
 
           <div>
             <label className="text-sm text-gray-300 block mb-2">Year</label>
-            <Select value={selectedYear} onValueChange={setSelectedYear}>
+            <Select value={selectedYear} onValueChange={(value) => setSelectedYear(value || "")}>
               <SelectTrigger className="bg-gray-800 border-gray-600 h-12 text-white">
                 <SelectValue placeholder="Select Year" />
               </SelectTrigger>
@@ -97,12 +105,25 @@ export default function PYQPage() {
 
           <div>
             <label className="text-sm text-gray-300 block mb-2">Semester</label>
-            <Select value={selectedSem} onValueChange={setSelectedSem}>
+            <Select value={selectedSem} onValueChange={(value) => setSelectedSem(value || "")}>
               <SelectTrigger className="bg-gray-800 border-gray-600 h-12 text-white">
                 <SelectValue placeholder="Select Semester" />
               </SelectTrigger>
               <SelectContent>
                 {semesters.map(s => <SelectItem key={s} value={s.toString()}>Semester {s}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm text-gray-300 block mb-2">Paper Type</label>
+            <Select value={selectedType} onValueChange={(value) => setSelectedType(value || "")}>
+              <SelectTrigger className="bg-gray-800 border-gray-600 h-12 text-white">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Types</SelectItem>
+                {types.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
@@ -119,19 +140,19 @@ export default function PYQPage() {
         <>
           <div className="mb-8">
             <h2 className="text-3xl font-semibold text-white">
-              {filteredPapers.length} Papers Found
+              {papers.length} Papers Found
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPapers.map((paper) => (
-              <Card key={paper.id} className="bg-gray-900 border-gray-700 hover:border-blue-500">
+            {papers.map((paper) => (
+              <Card key={paper.id} className="bg-gray-900 border-gray-700 hover:border-blue-500 transition-all">
                 <CardHeader>
                   <CardTitle className="text-white flex items-start gap-3">
                     <BookOpen className="w-6 h-6 text-blue-500 mt-1" />
                     {paper.subject}
                   </CardTitle>
-                  <p className="text-blue-400">{paper.paperTitle}</p>
+                  <p className="text-blue-400">{paper.paperTitle} • {paper.type}</p>
                 </CardHeader>
                 <CardContent className="flex gap-3">
                   <Button 
@@ -157,9 +178,10 @@ export default function PYQPage() {
             ))}
           </div>
 
-          {filteredPapers.length === 0 && !loading && (
+          {papers.length === 0 && (
             <p className="text-center text-gray-400 text-xl mt-20">
-              No papers found. Upload some papers from Admin panel first.
+              No papers found for this selection.<br />
+              Please upload some papers from the Admin panel first.
             </p>
           )}
         </>

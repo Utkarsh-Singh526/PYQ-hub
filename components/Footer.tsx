@@ -1,5 +1,7 @@
 'use client';
 
+import VisitorCounter from "./VisitorCounter";
+
 export default function Footer() {
   return (
     <footer className="bg-gray-900 border-t border-gray-800 py-12 mt-20">
@@ -69,11 +71,8 @@ export default function Footer() {
             © 2026 College PYQ Hub • Made with ❤️ for Students
           </p>
           
-          <p 
-            className="text-sm text-green-400 hover:text-green-500 cursor-pointer mt-4 inline-block"
-            onClick={() => window.open("https://github.com/Utkarsh-Singh526", "_blank")}
-          >
-            👥 Total Visitors: <span className="font-medium">1,847</span> (Click to visit GitHub)
+          <p className="text-sm text-green-400 mt-4">
+          👥 Total Visitors: <VisitorCounter />
           </p>
 
           <p className="text-xs text-gray-600 mt-6">
