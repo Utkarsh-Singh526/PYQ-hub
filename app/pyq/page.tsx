@@ -26,8 +26,8 @@ export default function PYQPage() {
   const [papers, setPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const branches = ["CSE", "ECE", "Mechanical", "Civil", "Electrical", "IT"];
-  const years = [2021, 2022, 2023, 2024, 2025, 2026];
+  const branches = ["CSE", "ECE", "ME", "CE", "EE", "AIML", "IT"];
+  const years = [2026, 2025, 2024, 2023, 2022, 2021, 2020];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
   const types = ["Sessional 1", "Sessional 2", "End Semester"];
 

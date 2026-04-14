@@ -19,8 +19,8 @@ export default function ImportantQuestionsPage() {
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedSem, setSelectedSem] = useState("");
 
-  const branches = ["CSE", "ECE", "Mechanical", "Civil", "Electrical"];
-  const years = [2023, 2024, 2025, 2026];
+  const branches = ["CSE", "ECE", "ME", "CE", "EE","AIML", "IT"];
+  const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
 
   const filteredQuestions = useMemo(() => {
@@ -45,7 +45,7 @@ export default function ImportantQuestionsPage() {
             <label className="text-sm text-gray-300 block mb-2">Branch</label>
           <Select 
                  value={selectedBranch} 
-                  onValueChange={(value) => setSelectedBranch(value)}>
+                  onValueChange={(value) => setSelectedBranch(value || "")}>
               <SelectTrigger className="bg-gray-800 border-gray-600 h-12 text-white">
                 <SelectValue placeholder="Select Branch" />
               </SelectTrigger>
@@ -57,7 +57,7 @@ export default function ImportantQuestionsPage() {
 
           <div>
             <label className="text-sm text-gray-300 block mb-2">Year</label>
-            <Select value={selectedYear} onValueChange={setSelectedYear}>
+            <Select value={selectedYear} onValueChange={(value) => setSelectedYear(value || "")}>
               <SelectTrigger className="bg-gray-800 border-gray-600 h-12 text-white">
                 <SelectValue placeholder="Select Year" />
               </SelectTrigger>
@@ -69,7 +69,7 @@ export default function ImportantQuestionsPage() {
 
           <div>
             <label className="text-sm text-gray-300 block mb-2">Semester</label>
-            <Select value={selectedSem} onValueChange={setSelectedSem}>
+            <Select value={selectedSem} onValueChange={(value) => setSelectedSem(value || "")}>
               <SelectTrigger className="bg-gray-800 border-gray-600 h-12 text-white">
                 <SelectValue placeholder="Select Semester" />
               </SelectTrigger>
