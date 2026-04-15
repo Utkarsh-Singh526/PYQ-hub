@@ -20,10 +20,11 @@ type Paper = {
 };
 
 export default function PYQPage() {
-  const [selectedBranch, setSelectedBranch] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
-  const [selectedSem, setSelectedSem] = useState("");
-  const [selectedType, setSelectedType] = useState("");   // ← New
+  const [selectedBranch, setSelectedBranch] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<string>("");
+  const [selectedSem, setSelectedSem] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<string>("");
+
   const [papers, setPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -39,25 +40,33 @@ export default function PYQPage() {
     }
 
     setLoading(true);
+    console.log("Fetching papers for:", { selectedBranch, selectedYear, selectedSem, selectedType });
+
     try {
       let query = supabase
         .from('pyq_papers')
         .select('*')
-        .or(`branch.eq.${selectedBranch},is_common.eq.true`)
         .eq('year', parseInt(selectedYear))
         .eq('semester', parseInt(selectedSem));
 
-      // Paper Type filter (agar select kiya ho)
+      // Paper type filter
       if (selectedType) {
         query = query.eq('type', selectedType);
       }
 
-      const { data, error } = await query.order('subject', { ascending: true });
+      // Branch OR Common papers
+      const { data, error } = await query
+        .or(`branch.eq.${selectedBranch},is_common.eq.true`)
+        .order('subject', { ascending: true });
 
-      if (error) console.error("Fetch error:", error);
-      setPapers(data || []);
+      if (error) {
+        console.error("Supabase Error:", error);
+      } else {
+        console.log("Fetched papers:", data?.length || 0, "papers");
+        setPapers(data || []);
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Unexpected error:", err);
     } finally {
       setLoading(false);
     }
@@ -77,12 +86,11 @@ export default function PYQPage() {
           <p className="text-gray-400 text-lg">Choose your branch, year, semester and paper type</p>
         </div>
 
-        {/* Filters */}
         <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 mb-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
               <label className="text-sm text-gray-400 mb-2 block">Branch</label>
-              <Select >
+              <Select onValueChange={(v) => setSelectedBranch(v || "")} value={selectedBranch}>
                 <SelectTrigger className="h-12 bg-gray-800 border-gray-600 text-white">
                   <SelectValue placeholder="Select Branch" />
                 </SelectTrigger>
@@ -94,7 +102,7 @@ export default function PYQPage() {
 
             <div>
               <label className="text-sm text-gray-400 mb-2 block">Year</label>
-              <Select onValueChange={(value) => setSelectedYear(value || "")} value={selectedYear}>
+              <Select onValueChange={(v) => setSelectedYear(v || "")} value={selectedYear}>
                 <SelectTrigger className="h-12 bg-gray-800 border-gray-600 text-white">
                   <SelectValue placeholder="Select Year" />
                 </SelectTrigger>
@@ -106,7 +114,7 @@ export default function PYQPage() {
 
             <div>
               <label className="text-sm text-gray-400 mb-2 block">Semester</label>
-              <Select onValueChange={(value) => setSelectedSem(value || "")} value={selectedSem}>
+              <Select onValueChange={(v) => setSelectedSem(v || "")} value={selectedSem}>
                 <SelectTrigger className="h-12 bg-gray-800 border-gray-600 text-white">
                   <SelectValue placeholder="Select Semester" />
                 </SelectTrigger>
@@ -116,51 +124,40 @@ export default function PYQPage() {
               </Select>
             </div>
 
-            {/* New Paper Type Filter */}
             <div>
               <label className="text-sm text-gray-400 mb-2 block">Paper Type</label>
-              <Select onValueChange={(value) => setSelectedType(value || "")} value={selectedType}>
+              <Select onValueChange={(v) => setSelectedType(v || "")} value={selectedType}>
                 <SelectTrigger className="h-12 bg-gray-800 border-gray-600 text-white">
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">All Types</SelectItem>
-                  {paperTypes.map(t => (
-                    <SelectItem key={t} value={t}>{t}</SelectItem>
-                  ))}
+                  {paperTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
           </div>
         </div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="flex justify-center py-20">
-            <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
-          </div>
-        )}
+        {loading && <div className="flex justify-center py-20"><Loader2 className="w-10 h-10 animate-spin text-blue-500" /></div>}
 
-        {/* No Papers */}
         {!loading && papers.length === 0 && selectedBranch && selectedYear && selectedSem && (
           <div className="text-center py-20">
             <p className="text-2xl text-gray-400">No papers found for this selection</p>
+            <p className="text-gray-500 mt-2">Try different combination or check if you have uploaded papers with "Common" option</p>
           </div>
         )}
 
-        {/* Papers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {papers.map((paper) => (
             <Card key={paper.id} className="bg-gray-900 border border-gray-700 hover:border-blue-600 transition-all group">
               <CardHeader>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-start">
                   <CardTitle className="text-xl text-white">{paper.subject}</CardTitle>
-                  {paper.is_common && (
-                    <span className="px-3 py-1 text-xs bg-green-500/20 text-green-400 rounded-full">Common</span>
-                  )}
+                  {paper.is_common && <span className="px-3 py-1 text-xs bg-green-500/20 text-green-400 rounded-full">Common</span>}
                 </div>
                 <p className="text-sm text-gray-400">
-                  {paper.branch} • {paper.year} • Sem {paper.semester}
+                  {paper.branch} • {paper.year} • Sem {paper.semester} • {paper.type}
                 </p>
               </CardHeader>
 
@@ -168,22 +165,15 @@ export default function PYQPage() {
                 <p className="text-gray-300 text-sm mb-6 line-clamp-2">{paper.paperTitle}</p>
 
                 <div className="flex gap-3">
-                  <Button 
-                    className="flex-1 bg-blue-600 hover:bg-blue-700"
-                    onClick={() => window.open(paper.fileUrl, '_blank')}
-                  >
+                  <Button className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => window.open(paper.fileUrl, '_blank')}>
                     <Eye className="mr-2 w-4 h-4" /> View
                   </Button>
-                  <Button 
-                    variant="outline"
-                    className="flex-1 border-gray-600 hover:bg-gray-800"
-                    onClick={() => {
-                      const link = document.createElement("a");
-                      link.href = paper.fileUrl;
-                      link.download = `${paper.subject}.pdf`;
-                      link.click();
-                    }}
-                  >
+                  <Button variant="outline" className="flex-1 border-gray-600 hover:bg-gray-800 text-white" onClick={() => {
+                    const link = document.createElement("a");
+                    link.href = paper.fileUrl;
+                    link.download = `${paper.subject}.pdf`;
+                    link.click();
+                  }}>
                     <Download className="mr-2 w-4 h-4" /> Download
                   </Button>
                 </div>
