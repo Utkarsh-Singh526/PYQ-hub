@@ -1,6 +1,6 @@
 'use client';
 
-import VisitorCounter from "./VisitorCounter";
+// import VisitorCounter from "./VisitorCounter";
 
 export default function Footer() {
   return (
@@ -37,9 +37,9 @@ export default function Footer() {
               {/* Prayagraj, Uttar Pradesh<br /> */}
               Computer Science Student
             </p>
-            <div className="text-gray-400 text-sm mb-4"><p className="text-sm text-green-400 mt-4">
+            {/* <div className="text-gray-400 text-sm mb-4"><p className="text-sm text-green-400 mt-4">
             👥 Total Visitors: <VisitorCounter />
-              </p></div>
+              </p></div> */}
 
             <div className="flex flex-wrap gap-x-8 gap-y-2 text-lg">
               <a 
@@ -73,10 +73,10 @@ export default function Footer() {
           <p className="text-gray-400 text-sm">
             © 2026 College PYQ Hub • Made with ❤️ for Students
           </p>
-          
+{/*           
           <p className="text-sm text-green-400 mt-4">
           👥 Total Visitors: <VisitorCounter />
-          </p>
+          </p> */}
 
           <p className="text-xs text-gray-600 mt-6">
             This project is for educational purposes only.
