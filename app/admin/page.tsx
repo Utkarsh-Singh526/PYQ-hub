@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, Loader2, Lock, Trash2, Edit,  CheckSquare, Square } from 'lucide-react';
+import { Upload, Loader2, Lock, Trash2, Edit, CheckSquare, Square } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import JSZip from 'jszip';
 
@@ -61,7 +61,7 @@ export default function AdminPage() {
   }, []);
 
   const handleLogin = () => {
-    if (password === "admin123") {
+    if (password === "526Utkarsh@") {          // ← New Password
       setIsLoggedIn(true);
       setShowLogin(false);
       localStorage.setItem("adminLoggedIn", "true");
@@ -100,18 +100,14 @@ export default function AdminPage() {
 
   const deleteSelected = async () => {
     if (selectedIds.length === 0) return;
-    if (!confirm(`Are you sure you want to delete ${selectedIds.length} papers?`)) return;
+    if (!confirm(`Delete ${selectedIds.length} papers?`)) return;
 
-    const { error } = await supabase
-      .from('pyq_papers')
-      .delete()
-      .in('id', selectedIds);
-
+    const { error } = await supabase.from('pyq_papers').delete().in('id', selectedIds);
     if (!error) {
-      setMessage(`✅ ${selectedIds.length} papers deleted successfully`);
+      setMessage(`✅ ${selectedIds.length} papers deleted`);
       loadPapers();
     } else {
-      setMessage("❌ Failed to delete selected papers");
+      setMessage("❌ Failed to delete");
     }
   };
 
@@ -149,7 +145,7 @@ export default function AdminPage() {
     }
   };
 
-  // Single PDF Upload
+  // Single Upload
   const handleSingleUpload = async () => {
     if (!subject || !paperTitle || !singleFile) {
       setMessage("❌ Please fill all fields");
@@ -193,16 +189,13 @@ export default function AdminPage() {
     if (!zipFile) return;
 
     setZipUploading(true);
-    setMessage("Extracting and uploading PDFs...");
+    setMessage("Extracting ZIP...");
     setZipProgress(0);
 
     try {
       const zip = new JSZip();
       const contents = await zip.loadAsync(zipFile);
-
-      const pdfFiles = Object.keys(contents.files).filter(name => 
-        name.toLowerCase().endsWith('.pdf')
-      );
+      const pdfFiles = Object.keys(contents.files).filter(n => n.toLowerCase().endsWith('.pdf'));
 
       let success = 0;
 
@@ -212,8 +205,8 @@ export default function AdminPage() {
         const fileData = await file.async('blob');
         const storageName = `${Date.now()}-${i}-${filename.split('/').pop()}`;
 
-        const { error: uploadError } = await supabase.storage.from('papers').upload(storageName, fileData);
-        if (uploadError) continue;
+        const { error: upErr } = await supabase.storage.from('papers').upload(storageName, fileData);
+        if (upErr) continue;
 
         const { data: urlData } = supabase.storage.from('papers').getPublicUrl(storageName);
 
@@ -235,7 +228,7 @@ export default function AdminPage() {
       setMessage(`✅ ${success} PDFs uploaded successfully!`);
       setZipFile(null);
     } catch (err: any) {
-      setMessage("❌ ZIP processing failed: " + err.message);
+      setMessage("❌ ZIP failed: " + err.message);
     } finally {
       setZipUploading(false);
     }
@@ -248,16 +241,20 @@ export default function AdminPage() {
           <CardHeader className="text-center">
             <Lock className="w-12 h-12 text-blue-500 mx-auto mb-4" />
             <CardTitle className="text-3xl">Admin Login</CardTitle>
+            <p className="text-gray-400 mt-2">Enter your password</p>
           </CardHeader>
           <CardContent className="space-y-6">
             <Input
               type="password"
-              placeholder="Enter password"
+              placeholder="Enter Admin Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
             />
             {error && <p className="text-red-400 text-center">{error}</p>}
-            <Button onClick={handleLogin} className="w-full py-6 bg-blue-600">Login</Button>
+            <Button onClick={handleLogin} className="w-full py-6 bg-blue-600 hover:bg-blue-700">
+              Login to Admin Panel
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -272,27 +269,12 @@ export default function AdminPage() {
       </div>
 
       <div className="flex gap-4 mb-8 border-b border-gray-700">
-        <button 
-          onClick={() => setActiveTab('single')} 
-          className={`px-8 py-3 font-medium rounded-t-lg ${activeTab === 'single' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          Single PDF
-        </button>
-        <button 
-          onClick={() => setActiveTab('zip')} 
-          className={`px-8 py-3 font-medium rounded-t-lg ${activeTab === 'zip' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          ZIP Upload
-        </button>
-        <button 
-          onClick={() => { setActiveTab('manage'); loadPapers(); }} 
-          className={`px-8 py-3 font-medium rounded-t-lg ${activeTab === 'manage' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          Manage Papers
-        </button>
+        <button onClick={() => setActiveTab('single')} className={`px-8 py-3 font-medium rounded-t-lg ${activeTab === 'single' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>Single PDF</button>
+        <button onClick={() => setActiveTab('zip')} className={`px-8 py-3 font-medium rounded-t-lg ${activeTab === 'zip' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>ZIP Upload</button>
+        <button onClick={() => { setActiveTab('manage'); loadPapers(); }} className={`px-8 py-3 font-medium rounded-t-lg ${activeTab === 'manage' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>Manage Papers</button>
       </div>
 
-      {/* Single Upload */}
+      {/* Single Upload Tab */}
       {activeTab === 'single' && (
         <Card className="bg-gray-900 border-gray-700">
           <CardHeader><CardTitle>Upload Single PDF</CardTitle></CardHeader>
@@ -304,17 +286,35 @@ export default function AdminPage() {
               <select value={branch} onChange={(e) => setBranch(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
                 <option value="CSE">CSE</option>
                 <option value="ECE">ECE</option>
+                <option value="ME">ME</option>
+                <option value="CE">CE</option>  
+                <option value="AIML">AIML</option>
+                <option value="EE">EE</option>
+                <option value="IT">IT</option>
+
+
+
               </select>
 
               <select value={year} onChange={(e) => setYear(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
+                <option value="2026">2025</option>
                 <option value="2025">2025</option>
                 <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
               </select>
 
               <select value={semester} onChange={(e) => setSemester(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
+                
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
                 <option value="3">Semester 3</option>
                 <option value="4">Semester 4</option>
                 <option value="5">Semester 5</option>
+                <option value="6">Semester 6</option>
+                <option value="7">Semester 7</option>
+                <option value="8">Semester 8</option>
               </select>
 
               <select value={paperType} onChange={(e) => setPaperType(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
@@ -325,29 +325,20 @@ export default function AdminPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <input 
-                type="checkbox" 
-                checked={isCommon} 
-                onChange={(e) => setIsCommon(e.target.checked)} 
-                className="w-5 h-5 accent-blue-600" 
-              />
+              <input type="checkbox" checked={isCommon} onChange={(e) => setIsCommon(e.target.checked)} className="w-5 h-5 accent-blue-600" />
               <label className="text-white">Mark as Common Paper (Show in all branches)</label>
             </div>
 
             <Input type="file" accept=".pdf" onChange={(e) => setSingleFile(e.target.files?.[0] || null)} />
 
-            <Button 
-              onClick={handleSingleUpload} 
-              disabled={loading || !subject || !paperTitle || !singleFile} 
-              className="w-full py-7 bg-blue-600"
-            >
+            <Button onClick={handleSingleUpload} disabled={loading || !subject || !paperTitle || !singleFile} className="w-full py-7 bg-blue-600">
               {loading ? "Uploading..." : "Upload Single PDF"}
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* ZIP Upload */}
+      {/* ZIP Upload Tab */}
       {activeTab === 'zip' && (
         <Card className="bg-gray-900 border-gray-700">
           <CardHeader><CardTitle>Upload ZIP File</CardTitle></CardHeader>
@@ -356,15 +347,31 @@ export default function AdminPage() {
               <select value={zipBranch} onChange={(e) => setZipBranch(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
                 <option value="CSE">CSE</option>
                 <option value="ECE">ECE</option>
+                <option value="ME">ME</option>
+                <option value="CE">CE</option>  
+                <option value="AIML">AIML</option>
+                <option value="EE">EE</option>
+                <option value="IT">IT</option>
+
               </select>
               <select value={zipYear} onChange={(e) => setZipYear(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
                 <option value="2025">2025</option>
                 <option value="2024">2024</option>
+                 <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
               </select>
               <select value={zipSemester} onChange={(e) => setZipSemester(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
+                
+                <option value="1">Sem 1</option>
+                <option value="2">Sem 2</option>
                 <option value="3">Sem 3</option>
                 <option value="4">Sem 4</option>
                 <option value="5">Sem 5</option>
+                <option value="6">Sem 6</option>
+                <option value="7">Semester 7</option>
+                <option value="8">Semester 8</option>
+                
               </select>
               <select value={zipType} onChange={(e) => setZipType(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
                 <option value="Sessional 1">Sessional 1</option>
@@ -374,29 +381,20 @@ export default function AdminPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <input 
-                type="checkbox" 
-                checked={zipIsCommon} 
-                onChange={(e) => setZipIsCommon(e.target.checked)} 
-                className="w-5 h-5 accent-blue-600" 
-              />
+              <input type="checkbox" checked={zipIsCommon} onChange={(e) => setZipIsCommon(e.target.checked)} className="w-5 h-5 accent-blue-600" />
               <label className="text-white">Mark all PDFs as Common (Show in all branches)</label>
             </div>
 
             <Input type="file" accept=".zip" onChange={(e) => setZipFile(e.target.files?.[0] || null)} />
 
-            <Button 
-              onClick={handleZipUpload} 
-              disabled={zipUploading || !zipFile} 
-              className="w-full py-7 bg-blue-600"
-            >
+            <Button onClick={handleZipUpload} disabled={zipUploading || !zipFile} className="w-full py-7 bg-blue-600">
               {zipUploading ? `Uploading... ${zipProgress}%` : "Upload ZIP"}
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Manage Papers */}
+      {/* Manage Papers Tab */}
       {activeTab === 'manage' && (
         <Card className="bg-gray-900 border-gray-700">
           <CardHeader className="flex flex-row justify-between items-center">
@@ -412,7 +410,7 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent>
             {manageLoading ? (
-              <p className="text-center py-10">Loading...</p>
+              <p className="text-center py-10">Loading papers...</p>
             ) : papers.length === 0 ? (
               <p className="text-center py-10 text-gray-400">No papers found</p>
             ) : (
@@ -447,7 +445,7 @@ export default function AdminPage() {
                         <Button variant="outline" size="sm" onClick={() => openEditModal(paper)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="destructive" size="sm" onClick={() => {/* single delete logic */}}>
+                        <Button variant="destructive" size="sm" onClick={() => {/* single delete later */}}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -475,18 +473,33 @@ export default function AdminPage() {
                 <select value={editBranch} onChange={(e) => setEditBranch(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
                   <option value="CSE">CSE</option>
                   <option value="ECE">ECE</option>
+                  <option value="ME">ME</option>
+                  <option value="CE">CE</option>
+                  <option value="AIML">AIML</option>
+                  <option value="EE">EE</option>
+                  <option value="IT">IT</option>
                 </select>
                 <select value={editYear} onChange={(e) => setEditYear(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
+                 <option value="2026">2025</option>
                   <option value="2025">2025</option>
                   <option value="2024">2024</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+                  <option value="2021">2021</option>
                 </select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <select value={editSemester} onChange={(e) => setEditSemester(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
+                  
+                  <option value="1">Sem 1</option>
+                  <option value="2">Sem 2</option>
                   <option value="3">Sem 3</option>
                   <option value="4">Sem 4</option>
                   <option value="5">Sem 5</option>
+                  <option value="6">Sem 6</option>
+                  <option value="7">Sem 7</option>
+                  <option value="8">Sem 8</option>
                 </select>
                 <select value={editType} onChange={(e) => setEditType(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
                   <option value="Sessional 1">Sessional 1</option>
