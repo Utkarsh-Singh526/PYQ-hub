@@ -297,7 +297,7 @@ export default function AdminPage() {
               </select>
 
               <select value={year} onChange={(e) => setYear(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
-                <option value="2026">2025</option>
+                <option value="2026">2026</option>
                 <option value="2025">2025</option>
                 <option value="2024">2024</option>
                 <option value="2023">2023</option>
@@ -355,6 +355,7 @@ export default function AdminPage() {
 
               </select>
               <select value={zipYear} onChange={(e) => setZipYear(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
+                <option value="2026">2026</option>
                 <option value="2025">2025</option>
                 <option value="2024">2024</option>
                  <option value="2023">2023</option>
@@ -480,7 +481,8 @@ export default function AdminPage() {
                   <option value="IT">IT</option>
                 </select>
                 <select value={editYear} onChange={(e) => setEditYear(e.target.value)} className="p-3 bg-gray-800 border border-gray-600 rounded-lg text-white">
-                 <option value="2026">2025</option>
+                 
+                 <option value="2026">2026</option>
                   <option value="2025">2025</option>
                   <option value="2024">2024</option>
                   <option value="2023">2023</option>

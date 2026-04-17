@@ -17,6 +17,8 @@ type Paper = {
   fileUrl: string;
   type: string;
   is_common: boolean;
+  common_branches?: string[];
+  common_semesters?: number[];
 };
 
 export default function PYQPage() {
@@ -28,8 +30,8 @@ export default function PYQPage() {
   const [papers, setPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const branches = ["CSE", "ECE", "ME", "CE", "AIML", "EE", "IT"];
-  const years = [2026, 2025, 2024, 2023, 2022, 2021];
+  const branches = ["CSE", "ECE", "Mechanical", "Civil", "Electrical", "IT"];
+  const years = [2021, 2022, 2023, 2024, 2025, 2026];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
   const paperTypes = ["Sessional 1", "Sessional 2", "End Semester"];
 
@@ -40,7 +42,7 @@ export default function PYQPage() {
     }
 
     setLoading(true);
-    console.log("Fetching papers for:", { selectedBranch, selectedYear, selectedSem, selectedType });
+    console.log("Fetching for:", { selectedBranch, selectedYear, selectedSem, selectedType });
 
     try {
       let query = supabase
@@ -49,21 +51,35 @@ export default function PYQPage() {
         .eq('year', parseInt(selectedYear))
         .eq('semester', parseInt(selectedSem));
 
-      // Paper type filter
       if (selectedType) {
         query = query.eq('type', selectedType);
       }
 
-      // Branch OR Common papers
+      // Advanced Common Logic
       const { data, error } = await query
         .or(`branch.eq.${selectedBranch},is_common.eq.true`)
         .order('subject', { ascending: true });
 
       if (error) {
-        console.error("Supabase Error:", error);
+        console.error("Supabase Fetch Error:", error);
       } else {
-        console.log("Fetched papers:", data?.length || 0, "papers");
-        setPapers(data || []);
+        // Additional client-side filter for selected branches/semesters
+        const filtered = (data || []).filter(paper => {
+          if (paper.is_common) {
+            // If common for all branches
+            if (!paper.common_branches && !paper.common_semesters) return true;
+
+            // If common for selected branches
+            if (paper.common_branches && paper.common_branches.includes(selectedBranch)) return true;
+
+            // If common for selected semesters
+            if (paper.common_semesters && paper.common_semesters.includes(parseInt(selectedSem))) return true;
+          }
+          return paper.branch === selectedBranch;
+        });
+
+        console.log("Final filtered papers:", filtered.length);
+        setPapers(filtered);
       }
     } catch (err) {
       console.error("Unexpected error:", err);
@@ -83,7 +99,7 @@ export default function PYQPage() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-white mb-3">Previous Year Question Papers</h1>
-          <p className="text-gray-400 text-lg">Choose your branch, year, semester and paper type</p>
+          <p className="text-gray-400 text-lg">Select branch, year, semester & type</p>
         </div>
 
         <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 mb-12">
@@ -144,7 +160,7 @@ export default function PYQPage() {
         {!loading && papers.length === 0 && selectedBranch && selectedYear && selectedSem && (
           <div className="text-center py-20">
             <p className="text-2xl text-gray-400">No papers found for this selection</p>
-            <p className="text-gray-500 mt-2">Try different combination or check if you have uploaded papers with "Common" option</p>
+            <p className="text-gray-500 mt-2">Make sure you have uploaded papers with Common setting</p>
           </div>
         )}
 
@@ -165,15 +181,22 @@ export default function PYQPage() {
                 <p className="text-gray-300 text-sm mb-6 line-clamp-2">{paper.paperTitle}</p>
 
                 <div className="flex gap-3">
-                  <Button className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => window.open(paper.fileUrl, '_blank')}>
-                    <Eye className="mr-2 w-4 h-4" /> View
+                  <Button 
+                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    onClick={() => window.open(paper.fileUrl, '_blank')}
+                  >
+                    <Eye className="mr-2 w-4 h-4" /> View PDF
                   </Button>
-                  <Button variant="outline" className="flex-1 border-gray-600 hover:bg-gray-800 text-white" onClick={() => {
-                    const link = document.createElement("a");
-                    link.href = paper.fileUrl;
-                    link.download = `${paper.subject}.pdf`;
-                    link.click();
-                  }}>
+                  <Button 
+                    variant="outline"
+                    className="flex-1 border-gray-600 hover:bg-gray-800 text-white"
+                    onClick={() => {
+                      const link = document.createElement("a");
+                      link.href = paper.fileUrl;
+                      link.download = `${paper.subject}.pdf`;
+                      link.click();
+                    }}
+                  >
                     <Download className="mr-2 w-4 h-4" /> Download
                   </Button>
                 </div>
