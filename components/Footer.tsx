@@ -1,6 +1,6 @@
 'use client';
 
-// import VisitorCounter from "./VisitorCounter";
+import VisitorCounter from "./VisitorCounter";
 
 export default function Footer() {
   return (
@@ -78,6 +78,13 @@ export default function Footer() {
           👥 Total Visitors: <VisitorCounter />
           </p> */}
 
+          <div className="text-sm text-green-400 mt-4">
+             Total Visitors: <VisitorCounter />
+          </div>
+
+            {/* <div className="text-sm">
+  <h1>Visitor Count</h1>
+</div> */}
           <p className="text-xs text-gray-600 mt-6">
             This project is for educational purposes only.
           </p>
