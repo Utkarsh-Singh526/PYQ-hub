@@ -1,6 +1,31 @@
+// lib/supabase.ts
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://cpmyyeottwnhyiwayjqm.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwbXl5ZW90dHduaHlpd2F5anFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTYwMzgsImV4cCI6MjA5MTQ5MjAzOH0.dBAHBLlJSSvkHnN_ORQJ6O6LSWILExO39pY1pADjKPA';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables. Check your .env file.');
+}
+
+// Singleton pattern to prevent multiple instances
+let supabaseInstance: any = null;
+
+export const supabase = (() => {
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+      },
+      realtime: {
+        params: {
+          eventsPerSecond: 8,
+        },
+      },
+    });
+    console.log('✅ Supabase client initialized (Singleton)');
+  }
+  return supabaseInstance;
+})();

@@ -30,8 +30,8 @@ export default function PYQPage() {
   const [papers, setPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const branches = ["CSE", "ECE", "Mechanical", "Civil", "Electrical", "IT"];
-  const years = [2021, 2022, 2023, 2024, 2025, 2026];
+  const branches = ["CSE", "ECE", "ME", "CE", "EE", "IT","AIML"];
+  const years = [2026, 2025, 2024, 2023, 2022, 2021, 2020];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
   const paperTypes = ["Sessional 1", "Sessional 2", "End Semester"];
 
@@ -64,7 +64,7 @@ export default function PYQPage() {
         console.error("Supabase Fetch Error:", error);
       } else {
         // Additional client-side filter for selected branches/semesters
-        const filtered = (data || []).filter(paper => {
+        const filtered = (data || []).filter( paper=> {
           if (paper.is_common) {
             // If common for all branches
             if (!paper.common_branches && !paper.common_semesters) return true;
@@ -160,7 +160,7 @@ export default function PYQPage() {
         {!loading && papers.length === 0 && selectedBranch && selectedYear && selectedSem && (
           <div className="text-center py-20">
             <p className="text-2xl text-gray-400">No papers found for this selection</p>
-            <p className="text-gray-500 mt-2">Make sure you have uploaded papers with Common setting</p>
+            <p className="text-gray-500 mt-2 font-semibold">Comming Soon...</p>
           </div>
         )}
 
@@ -181,7 +181,7 @@ export default function PYQPage() {
                 <p className="text-gray-300 text-sm mb-6 line-clamp-2">{paper.paperTitle}</p>
 
                 <div className="flex gap-3">
-                  <Button 
+                   <Button 
                     className="flex-1 bg-blue-600 hover:bg-blue-700"
                     onClick={() => window.open(paper.fileUrl, '_blank')}
                   >
