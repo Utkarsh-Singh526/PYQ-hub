@@ -190,15 +190,16 @@ export default function PYQPage() {
                   <Button 
                     variant="outline"
                     className="flex-1 border-gray-600 hover:bg-gray-800 text-white"
-                    onClick={() => {
-                      const link = document.createElement("a");
-                      link.href = paper.fileUrl;
-                      link.download = `${paper.subject}.pdf`;
-                      link.click();
-                    }}
-                  >
+                  
+                    onClick={() => window.open(paper.fileUrl, '_blank', 'noopener,noreferrer')}
+                    // className="flex-1 bg-blue-600 hover:bg-blue-700"
+>
+                     <Eye className="mr-2 w-4 h-4" /> View
+                    </Button>
+                    
+                  {/* <Button>
                     <Download className="mr-2 w-4 h-4" /> Download
-                  </Button>
+                  </Button> */}
                 </div>
               </CardContent>
             </Card>

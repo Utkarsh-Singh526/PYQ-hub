@@ -109,6 +109,8 @@ export default function SingleUpload() {
             <option value="Sessional 1">Sessional 1</option>
             <option value="Sessional 2">Sessional 2</option>
             <option value="End Semester">End Semester</option>
+            <option value="Important Questions">Important Questions</option>
+            <option value="Syllabus">Syllabus</option>
           </select>
         </div>
 
