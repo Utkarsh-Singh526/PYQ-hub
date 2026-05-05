@@ -89,10 +89,19 @@ export default function ManagePapers() {
     setSelectedIds(selectedIds.length === allIds.length ? [] : allIds);
   };
 
+  // const viewPaper = (fileUrl: string) => {
+  //   window.open(fileUrl, '_blank', 'noopener,noreferrer');
+  // };
   const viewPaper = (fileUrl: string) => {
-    window.open(fileUrl, '_blank', 'noopener,noreferrer');
+  // Strong method to force open in new tab
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
   };
-
   const deletePaper = async (id: string) => {
     if (!confirm("Are you sure you want to delete this paper?")) return;
     const { error } = await supabase.from('pyq_papers').delete().eq('id', id);
@@ -201,9 +210,16 @@ export default function ManagePapers() {
                         </p>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => viewPaper(paper.fileUrl)}>
+                        {/* <Button variant="outline" size="sm" onClick={() => viewPaper(paper.fileUrl)}>
                           <Eye className="w-4 h-4" /> View
-                        </Button>
+                        </Button> */}
+                        <Button 
+                onClick={() => viewPaper(paper.fileUrl)}
+  className="flex-1 bg-blue-600 hover:bg-blue-700"
+>
+  <Eye className="mr-2 w-4 h-4" /> View PDF
+</Button>
+                        
                         <Button variant="outline" size="sm" onClick={() => openEditModal(paper)}>
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -242,6 +258,8 @@ export default function ManagePapers() {
                   <option value="Sessional 1">Sessional 1</option>
                   <option value="Sessional 2">Sessional 2</option>
                   <option value="End Semester">End Semester</option>
+                  <option value="Important Questions">Important Questions</option>
+                  <option value="Syllabus">Syllabus</option>
                 </select>
               </div>
               <div className="flex gap-4 pt-6">

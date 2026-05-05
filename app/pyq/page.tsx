@@ -179,9 +179,30 @@ export default function PYQPage() {
 
               <CardContent>
                 <p className="text-gray-300 text-sm mb-6 line-clamp-2">{paper.paperTitle}</p>
-
                 <div className="flex gap-3">
-                   <Button 
+  <Button 
+    onClick={() => viewPaper(paper.fileUrl)}
+    className="flex-1 bg-blue-600 hover:bg-blue-700"
+  >
+    <Eye className="mr-2 w-4 h-4" /> View PDF
+  </Button>
+  
+  <Button 
+    variant="outline" 
+    onClick={() => {
+      const a = document.createElement("a");
+      a.href = paper.fileUrl;
+      a.download = `${paper.subject}.pdf`;
+      a.click();
+    }}
+    className="flex-1 border-gray-600 text-white hover:bg-gray-800"
+  >
+    <Download className="mr-2 w-4 h-4" /> Download
+  </Button>
+</div>
+
+                {/* <div className="flex gap-3">
+                   {/* <Button 
                     className="flex-1 bg-blue-600 hover:bg-blue-700"
                     onClick={() => window.open(paper.fileUrl, '_blank')}
                   >
@@ -195,12 +216,12 @@ export default function PYQPage() {
                     // className="flex-1 bg-blue-600 hover:bg-blue-700"
 >
                      <Eye className="mr-2 w-4 h-4" /> View
-                    </Button>
+                    </Button> */}
                     
                   {/* <Button>
                     <Download className="mr-2 w-4 h-4" /> Download
                   </Button> */}
-                </div>
+                {/* </div> */}
               </CardContent>
             </Card>
           ))}

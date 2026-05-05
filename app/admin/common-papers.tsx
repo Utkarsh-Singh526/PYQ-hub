@@ -54,9 +54,19 @@ export default function CommonPapers() {
     return groups;
   }, [filteredPapers]);
 
+  // const viewPaper = (fileUrl: string) => {
+  //   window.open(fileUrl, '_blank');
+  // };
   const viewPaper = (fileUrl: string) => {
-    window.open(fileUrl, '_blank');
-  };
+  // Strong method to force open in new tab
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
   const openEditModal = (paper: any) => { /* same as before */ 
     setEditingPaper(paper);
